@@ -8,6 +8,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.control.Label;
 import javafx.geometry.Insets;
@@ -22,8 +24,15 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		BorderPane pane = new BorderPane();
 		BorderPane top = new BorderPane();
-		GridPane center = new GridPane();
+		Pane center = new Pane();
 		BorderPane bottom = new BorderPane();
+		
+		addCity(14,pane);
+		addCity(89,pane);
+		addCity(62,pane);
+		
+		
+		
 		
 		top.setStyle("-fx-border-color: black");
 		bottom.setStyle("-fx-border-color: black");
@@ -39,14 +48,6 @@ public class Main extends Application {
 		topLeft.getChildren().add(new Text("Level:"));
 		topLeft.setPadding(new Insets(2,2,2,2));
 		
-		center.setAlignment(Pos.CENTER);
-		center.setHgap(0);
-		center.setVgap(0);
-		for(int i = 0; i<10; i++) {
-			for(int j = 0; j<10; j++) {
-				center.add(new Pane(),i,j);
-			}
-		}
 			
 		StackPane bottomRight = new StackPane();
 		bottomRight.setAlignment(Pos.CENTER_RIGHT);
@@ -71,7 +72,7 @@ public class Main extends Application {
 		pane.setCenter(center);
 		pane.setBottom(bottom);
 			
-		Scene scene = new Scene(pane,600,750);
+		Scene scene = new Scene(pane,600,790);
 		primaryStage.setTitle("Travel");
 		primaryStage.setScene(scene);
 		primaryStage.show();		
@@ -79,6 +80,13 @@ public class Main extends Application {
 	
 	public static void main(String[] args) {
 		launch(args);
+	}
+	public void addCity(int x,Pane pane){
+		x=x-1;
+		int a=x/10;
+		int b=x%10;
+		Circle c1 = new Circle(30+60*b,53+60*a, 30);
+		pane.getChildren().add(c1);
 	}
 }
 
