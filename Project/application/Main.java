@@ -18,8 +18,11 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Text;
 import javafx.scene.control.Button;
 import javafx.scene.text.Font;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 
 public class Main extends Application {
+	public static int level =0;
 	@Override
 	public void start(Stage primaryStage) {
 		BorderPane pane = new BorderPane();
@@ -27,9 +30,10 @@ public class Main extends Application {
 		Pane center = new Pane();
 		BorderPane bottom = new BorderPane();
 		
-		addCity(14,pane);
-		addCity(89,pane);
-		addCity(62,pane);
+		addCity1(91,pane);
+		addCity1(100,pane);
+		addCity1(1,pane);
+		addCity1(10,pane);
 		
 		
 		
@@ -39,7 +43,17 @@ public class Main extends Application {
 		center.setStyle("-fx-border-color: black");
 		
 		StackPane topRight = new StackPane();
-		topRight.getChildren().add(new Text("Next Level>>"));
+        Button nextLevel = new Button("Next Level>>");
+        class LevelHandler implements EventHandler<ActionEvent> {
+            @Override
+            public void handle(ActionEvent arg0) {
+            	level++;
+            	levelInitializer("level"+0);
+            	levelInitializer("level"+level);
+            	
+            }
+        }
+        nextLevel.setOnAction(new LevelHandler());
 		
 		StackPane topMid = new StackPane();
 		topMid.getChildren().add(new Text("Score:"));
@@ -86,9 +100,30 @@ public class Main extends Application {
 		int a=x/10;
 		int b=x%10;
 		Circle c1 = new Circle(30+60*b,53+60*a, 30);
+		
 		pane.getChildren().add(c1);
+		
+	}
+	public void addCity1(int x,Pane pane){
+		x=x-1;
+		int a=x/10;
+		int b=x%10;
+		Circle c1 = new Circle(30+60*b,53+60*a, 30);
+		c1.radiusProperty().bind((pane.heightProperty().subtract(190)).divide(20));
+		c1.centerXProperty().bind((pane.heightProperty().subtract(190)).divide(10).multiply(b-5).add(300).add(c1.radiusProperty()).add((pane.widthProperty().divide(2)).subtract(300)));
+		c1.centerYProperty().bind ((pane.heightProperty().subtract(190)).divide(10).multiply(a).add(23).add(c1.radiusProperty()));
+		pane.getChildren().add(c1);
+		
+	}
+	public void levelInitializer(String filename) {
+		java.io.File file = new java.io.File(filename);
+		
 	}
 }
+
+
+
+
 
 
 
