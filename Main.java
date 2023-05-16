@@ -1,5 +1,7 @@
 package application;
 	
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -11,11 +13,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.FlowPane;
@@ -34,14 +38,18 @@ public class Main extends Application {
 		Pane center = new Pane();
 		BorderPane bottom = new BorderPane();
 		
-		addCity1(91,pane);
-		addCity1(100,pane);
-		addCity1(1,pane);
-		addCity1(10,pane);
+	/*	addCity1(91,pane,center);
+		addCity1(100,pane,center);
+		addCity1(1,pane,center);
+		addCity1(10,pane,center); */
 				
 		top.setStyle("-fx-border-color: black");
 		bottom.setStyle("-fx-border-color: black");
 		center.setStyle("-fx-border-color: black");
+		
+		StackPane topLeft = new StackPane();
+		topLeft.getChildren().add(new Text("Level: " + level));
+		topLeft.setPadding(new Insets(2,2,2,2));
 		
 		StackPane topRight = new StackPane();
         Button nextLevel = new Button("Next Level>>");
@@ -49,20 +57,18 @@ public class Main extends Application {
             @Override
             public void handle(ActionEvent arg0) {
             	level++;
-            	levelInitializer("level0.txt");
+            	topLeft.getChildren().clear();
+            	topLeft.getChildren().add(new Text("Level: " + level));
+            	center.getChildren().clear();
             	levelInitializer("level"+level+".txt");
             	
             }
         }
         nextLevel.setOnAction(new LevelHandler());
+        topRight.getChildren().add(nextLevel);
 		
 		StackPane topMid = new StackPane();
 		topMid.getChildren().add(new Text("Score:"));
-		
-		StackPane topLeft = new StackPane();
-		topLeft.getChildren().add(new Text("Level: " + level));
-		topLeft.setPadding(new Insets(2,2,2,2));
-		
 			
 		Button deneme = new Button("O");
 		Font asd = new Font(30);
@@ -107,29 +113,34 @@ public class Main extends Application {
 		Scene scene = new Scene(pane,600,790);
 		primaryStage.setTitle("Travel");
 		primaryStage.setScene(scene);
-		primaryStage.show();		
+		primaryStage.show();	
 	}
 	
 	public static void main(String[] args) {
 		launch(args);
 	}
 
-	public void addCity1(int x,Pane pane){
+	public void addCity1(int x,Pane pane,Pane center, City city){
 		x=x-1;
 		int a=x/10;
 		int b=x%10;
-		Circle c1 = new Circle(30+60*b,53+60*a, 30);
+		File file = new File("levels\\house.jpg");
+		Circle c1 = createCircle(30+60*b,53+60*a, 30, file.getAbsolutePath());
 		c1.radiusProperty().bind((pane.heightProperty().subtract(190)).divide(20));
 		c1.centerXProperty().bind((pane.heightProperty().subtract(190)).divide(10).multiply(b-5).add(300).add(c1.radiusProperty()).add((pane.widthProperty().divide(2)).subtract(300)));
-		c1.centerYProperty().bind ((pane.heightProperty().subtract(190)).divide(10).multiply(a).add(23).add(c1.radiusProperty()));
-		Button city = new Button("O");
-		Font font = new Font(30);
-		city.setStyle("-fx-background-color: blue; -fx-border-width: 0;");
-		city.setFont(font);
-		city.setLayoutX(c1.getLayoutX());
-		city.setLayoutY(c1.getLayoutY());
-		city.setShape(c1);
-		pane.getChildren().add(city);
+		c1.centerYProperty().bind ((pane.heightProperty().subtract(196)).divide(10).multiply(a).add(28).add(c1.radiusProperty()));
+		Button deneme = new Button("   ");
+		Font asd = new Font(30);
+		deneme.setStyle("-fx-background-color: transparent; -fx-border-width: 0;");
+		deneme.setFont(asd);
+		center.getChildren().add(deneme);
+		deneme.setLayoutX(450);
+		deneme.setLayoutY(300);
+        Circle buttonCircle = new Circle(60);
+        buttonCircle.radiusProperty().bind((pane.heightProperty().subtract(190)).divide(20));
+		deneme.setShape(buttonCircle);
+		deneme.layoutXProperty().bind((pane.heightProperty().subtract(190)).divide(10).multiply(b-5).add(300).add(c1.radiusProperty()).add((pane.widthProperty().divide(2)).subtract(328)));
+		deneme.layoutYProperty().bind ((pane.heightProperty().subtract(196)).divide(10).multiply(a).subtract(34).add(c1.radiusProperty()));
 		class Deneme implements EventHandler<ActionEvent> {
             @Override
             public void handle(ActionEvent arg0) {
@@ -137,50 +148,61 @@ public class Main extends Application {
             	
             }
         }
-		city.setOnAction(new Deneme());
+		deneme.setOnAction(new Deneme());
 		
 		pane.getChildren().add(c1);
 		
 	}
 	public void levelInitializer(String filename) {
-		java.io.File file = new java.io.File(filename);
-		Scanner scanner = new Scanner(filename);
-		while(scanner.hasNextLine()) {
-			String item = scanner.nextLine();
-			addItem(item);
+				
+		try {
+			java.io.File file = new java.io.File("levels\\"+filename);
+			Scanner scanner = new Scanner(file);
+			while(scanner.hasNextLine()) {
+				String item = scanner.nextLine();
+				if(addItem(item) instanceof City) {
+					City city = (City)addItem(item);
+					
+				}
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
 	}
 	
 	public Object addItem(String item) {
 		int first,second,third;
 		switch (item.charAt(0)) {
 			case 'C' : 	first = item.indexOf(',');
-						second = item.indexOf(',', first);
-						third = item.indexOf(',', second);
-						City city = new City(item.substring(first+1, second), Integer.parseInt(item.substring(second+1, third)), Integer.parseInt(item.substring(third)));
+						second = item.indexOf(',', first+1);
+						third = item.indexOf(',', second+1);
+						City city = new City(item.substring(first+1, second), Integer.parseInt(item.substring(second+1, third)), Integer.parseInt(item.substring(third+1)));
 						return (Object)city;
 			case 'P' :	first = item.indexOf(',');
-						second = item.indexOf(',', first);
-						third = item.indexOf(',', second);
-						Passenger passenger = new Passenger(Integer.parseInt(item.substring(first+1, second)), Integer.parseInt(item.substring(second+1, third)), Integer.parseInt(item.substring(third)));
+						second = item.indexOf(',', first+1);
+						third = item.lastIndexOf(',');
+						Passenger passenger = new Passenger(Integer.parseInt(item.substring(first+1, second)), Integer.parseInt(item.substring(second+1, third)), Integer.parseInt(item.substring(third+1)));
 						return (Object)passenger;
 			case 'V' :	first = item.indexOf(',');
-						second = item.indexOf(',', first);
-						third = item.indexOf(',', second);
-						Vehicle vehicle = new Vehicle(Integer.parseInt(item.substring(first+1, second)), Integer.parseInt(item.substring(second+1, third)));
+						second = item.indexOf(',', first+1);
+						third = item.indexOf(',', second+1);
+						Vehicle vehicle = new Vehicle(Integer.parseInt(item.substring(first+1, second)), Integer.parseInt(item.substring(second+1)));
 						return (Object)vehicle;
 			case 'F' :	first = item.indexOf(',');
-						second = item.indexOf(',', first);
-						third = item.indexOf(',', second);
-						Fixed fixed = new Fixed(Integer.parseInt(item.substring(first+1, second)));
+						second = item.indexOf(',', first+1);
+						third = item.indexOf(',', second+1);
+						Fixed fixed = new Fixed(Integer.parseInt(item.substring(first+1)));
 						return (Object)fixed;
 			default  :	return new Object();
 		}
 	}
+	private Circle createCircle(double centerX, double centerY, double radius, String imagePath) {
+        // Daire oluşturma
+        Circle circle = new Circle(centerX, centerY, radius);
+        circle.setFill(new ImagePattern(new Image(imagePath)));
+
+        return circle;
+    }
 }
-
-
-
-
-
-
